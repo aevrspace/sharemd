@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Markdown Viewer
+
+A modern, feature-rich application for sharing and viewing Markdown files. Upload your markdown files or paste content directly to generate shareable links instantly.
+
+![Markdown Viewer](public/og.png)
+
+## Features
+
+- **Easy Upload**: Drag and drop `.md` files or paste markdown text directly.
+- **Instant Sharing**: Generate unique, shareable links for your markdown content.
+- **Beautiful Viewer**: Render markdown with syntax highlighting and a clean, readable typography.
+- **Local Storage**: Automatically save your generated links to "My Links" for easy access later.
+- **Export Options**: Download your markdown content as a file.
+- **Dark Mode**: Fully supports dark mode for comfortable reading.
+- **Responsive Design**: Works seamlessly on desktop and mobile devices.
+
+## Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **Database**: [MongoDB](https://www.mongodb.com/) (via Mongoose)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **UI Components**: Custom components with [Radix UI](https://www.radix-ui.com/) primitives.
+- **Icons**: [Iconsax React](https://github.com/lusaxweb/iconsax-react)
 
 ## Getting Started
 
-First, run the development server:
+Follow these instructions to set up the project locally.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [MongoDB](https://www.mongodb.com/) (Local instance or Atlas cluster)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Installation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1.  **Clone the repository**
 
-## Learn More
+    ```bash
+    git clone https://github.com/yourusername/md-viewer.git
+    cd md-viewer
+    ```
 
-To learn more about Next.js, take a look at the following resources:
+2.  **Install dependencies**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    ```bash
+    npm install
+    # or
+    pnpm install
+    # or
+    yarn install
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3.  **Environment Setup**
 
-## Deploy on Vercel
+    Create a `.env.local` file in the root directory and add your MongoDB connection string:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    ```env
+    MONGODB_URI=mongodb://localhost:27017/md-viewer
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    If you don't provide this, it will default to the local connection string above.
+
+4.  **Run the development server**
+
+    ```bash
+    npm run dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Usage
+
+1.  **Create a Link**:
+    - On the home page, drag and drop a markdown file into the upload area.
+    - Alternatively, paste your markdown text into the text area and click "Generate Link".
+2.  **View & Share**:
+    - You will be redirected to a view page with your rendered markdown.
+    - Use the toolbar to **Share** (copy link), **Download**, or **Bookmark** the page.
+3.  **Manage Links**:
+    - Click "My Links" in the header to see a history of your created and saved markdowns.
+    - Links are stored locally in your browser.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1.  Fork the project
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
