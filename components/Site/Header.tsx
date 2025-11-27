@@ -40,7 +40,7 @@ const SiteHeader = () => {
             onClick={() => setIsOpen(!isOpen)}
             className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
-            <ArchiveBook size={18} variant="Bulk" />
+            <ArchiveBook size={18} variant="Bulk" color="currentColor" />
             <span className="hidden sm:inline">My Links</span>
             {links.length > 0 && (
               <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
@@ -93,7 +93,7 @@ const SiteHeader = () => {
                         className="ml-2 rounded p-1 text-zinc-400 opacity-0 hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:hover:bg-red-900/20 dark:hover:text-red-400"
                         title="Remove"
                       >
-                        <Trash size={16} variant="Bulk" />
+                        <Trash size={16} variant="Bulk" color="currentColor" />
                       </button>
                     </div>
                   ))}

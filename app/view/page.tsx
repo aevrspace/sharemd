@@ -103,7 +103,7 @@ function ViewContent() {
             className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
             title="Share Link"
           >
-            <Share size={18} variant="Bulk" />
+            <Share size={18} variant="Bulk" color="currentColor" />
             <span className="hidden sm:inline">Share</span>
           </button>
           <button
@@ -111,7 +111,7 @@ function ViewContent() {
             className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
             title="Download Markdown"
           >
-            <DocumentDownload size={18} variant="Bulk" />
+            <DocumentDownload size={18} variant="Bulk" color="currentColor" />
             <span className="hidden sm:inline">Download</span>
           </button>
           <button
@@ -126,6 +126,7 @@ function ViewContent() {
             <ArchiveBook
               size={18}
               variant={id && isSaved(id) ? "Bold" : "Bulk"}
+              color="currentColor"
             />
             <span className="hidden sm:inline">
               {id && isSaved(id) ? "Saved" : "Save"}
