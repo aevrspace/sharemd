@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import SiteLogo from "@/components/Site/Logo";
-import { ArchiveBook, Trash } from "iconsax-react";
+import {
+  ArchiveBook,
+  Trash,
+  ArrowRight2,
+  ArrowDown2,
+  Folder,
+} from "iconsax-react";
 import { useState, useRef, useEffect, useSyncExternalStore } from "react";
 import { useSavedLinks } from "@/hooks/use-saved-links";
 import { formatDistanceToNow } from "date-fns";
@@ -12,7 +18,11 @@ import { Moon, Sun1 } from "iconsax-react";
 
 const SiteHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { links, removeLink } = useSavedLinks();
+  const { links, groups, removeLink, deleteGroup, removeFromGroup } =
+    useSavedLinks();
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    {}
+  );
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
   const mounted = useSyncExternalStore(
@@ -92,6 +102,120 @@ const SiteHeader = () => {
                   </div>
                 ) : (
                   <div className="max-h-80 overflow-y-auto">
+                    {/* Groups Section */}
+                    {groups.length > 0 && (
+                      <div className="mb-2 space-y-1">
+                        <div className="px-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                          Groups
+                        </div>
+                        {groups.map((group) => (
+                          <div
+                            key={group.id}
+                            className="rounded-lg bg-zinc-50/50 dark:bg-zinc-900/50"
+                          >
+                            <div
+                              className="group flex items-center justify-between rounded-lg p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                              onClick={() =>
+                                setExpandedGroups((prev) => ({
+                                  ...prev,
+                                  [group.id]: !prev[group.id],
+                                }))
+                              }
+                            >
+                              <div className="flex items-center gap-2 overflow-hidden">
+                                {expandedGroups[group.id] ? (
+                                  <ArrowDown2
+                                    size={14}
+                                    className="text-zinc-400"
+                                    color="currentColor"
+                                    variant="Bulk"
+                                  />
+                                ) : (
+                                  <ArrowRight2
+                                    size={14}
+                                    className="text-zinc-400"
+                                    color="currentColor"
+                                    variant="Bulk"
+                                  />
+                                )}
+                                <Folder
+                                  size={16}
+                                  className="text-indigo-500"
+                                  color="currentColor"
+                                  variant="Bulk"
+                                />
+                                <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                                  {group.title}
+                                </span>
+                                <span className="text-xs text-zinc-400">
+                                  ({group.linkIds.length})
+                                </span>
+                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteGroup(group.id);
+                                }}
+                                className="ml-2 rounded p-1 text-zinc-400 opacity-0 hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                                title="Delete Group"
+                              >
+                                <Trash
+                                  size={14}
+                                  variant="Bulk"
+                                  color="currentColor"
+                                />
+                              </button>
+                            </div>
+
+                            {expandedGroups[group.id] && (
+                              <div className="ml-6 space-y-1 border-l border-zinc-200 pl-2 dark:border-zinc-800">
+                                {group.linkIds.map((linkId) => {
+                                  const link = links.find(
+                                    (l) => l.id === linkId
+                                  );
+                                  if (!link) return null;
+                                  return (
+                                    <div
+                                      key={linkId}
+                                      className="group/item flex items-center justify-between rounded-md p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                    >
+                                      <Link
+                                        href={`/view?id=${link.id}`}
+                                        className="flex-1 overflow-hidden"
+                                        onClick={() => setIsOpen(false)}
+                                      >
+                                        <p className="truncate text-xs text-zinc-700 dark:text-zinc-300">
+                                          {link.title}
+                                        </p>
+                                      </Link>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          removeFromGroup(group.id, link.id);
+                                        }}
+                                        className="ml-2 rounded p-0.5 text-zinc-400 opacity-0 hover:text-red-500 group-hover/item:opacity-100"
+                                        title="Remove from group"
+                                      >
+                                        <Trash
+                                          size={12}
+                                          variant="Bulk"
+                                          color="currentColor"
+                                        />
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* All Links Section */}
+                    <div className="px-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-2">
+                      All Links
+                    </div>
                     {links.map((link) => (
                       <div
                         key={link.id}

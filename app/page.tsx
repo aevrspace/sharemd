@@ -10,10 +10,13 @@ import { InfoBox } from "@/components/ui/aevr/info-box";
 import Link from "next/link";
 
 export default function Home() {
-  const [generatedLink, setGeneratedLink] = useState<string | null>(null);
+  const [generatedLinks, setGeneratedLinks] = useState<
+    Array<{ id: string; title: string; url: string }>
+  >([]);
   const [textInput, setTextInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const { saveLink } = useSavedLinks();
+  const [groupName, setGroupName] = useState("");
+  const { saveLink, createGroup } = useSavedLinks();
 
   // We need to construct the provider manually because s3Uploader is an instance,
   // but FileUpload expects a provider object that matches the interface.
@@ -48,13 +51,25 @@ export default function Home() {
     },
   };
 
-  const handleFilesChange = (files: UploadedFile[]) => {
-    if (files.length > 0 && files[0].uploadResult) {
-      const fileData = files[0].uploadResult as { id: string };
-      if (fileData.id) {
-        generateLink(fileData.id, files[0].file.name);
-      }
+  const handleUploadSuccess = (
+    file: File,
+    result?: Record<string, unknown>
+  ) => {
+    if (result && (result as { id: string }).id) {
+      const id = (result as { id: string }).id;
+      const url = `${window.location.origin}/view?id=${id}`;
+      setGeneratedLinks((prev) => {
+        if (prev.some((link) => link.id === id)) return prev;
+        return [...prev, { id, title: file.name, url }];
+      });
+      saveLink(id, file.name);
     }
+  };
+
+  const handleFilesChange = (_files: UploadedFile[]) => {
+    // We can use this to clear generated links if files are removed,
+    // but for now let's just keep them.
+    // Or we could sync them.
   };
 
   const handleTextUpload = async () => {
@@ -76,7 +91,13 @@ export default function Home() {
       const result = await response.json();
 
       if (result.success && result.data) {
-        generateLink(result.data.id, "Untitled Markdown");
+        const id = result.data.id;
+        const url = `${window.location.origin}/view?id=${id}`;
+        setGeneratedLinks((prev) => [
+          ...prev,
+          { id, title: "Untitled Markdown", url },
+        ]);
+        saveLink(id, "Untitled Markdown");
         toast.success("Text uploaded successfully!");
       } else {
         toast.error(result.error || "Failed to upload text");
@@ -89,17 +110,20 @@ export default function Home() {
     }
   };
 
-  const generateLink = (id: string, title?: string) => {
-    const link = `${window.location.origin}/view?id=${id}`;
-    setGeneratedLink(link);
-    saveLink(id, title);
+  const copyLink = (link: string) => {
+    navigator.clipboard.writeText(link);
+    toast.success("Link copied to clipboard!");
   };
 
-  const copyLink = () => {
-    if (generatedLink) {
-      navigator.clipboard.writeText(generatedLink);
-      toast.success("Link copied to clipboard!");
+  const handleCreateGroup = () => {
+    if (!groupName.trim()) {
+      toast.error("Please enter a group name");
+      return;
     }
+    const linkIds = generatedLinks.map((l) => l.id);
+    createGroup(groupName, linkIds);
+    toast.success(`Group "${groupName}" created!`);
+    setGroupName("");
   };
 
   return (
@@ -120,9 +144,11 @@ export default function Home() {
           </h2>
           <FileUpload
             onFilesChange={handleFilesChange}
+            onUploadSuccess={handleUploadSuccess}
             provider={uploadProvider}
             acceptedTypes={[".md", ".markdown", ".txt"]}
-            maxFiles={1}
+            maxFiles={10}
+            multiple={true}
             title="Drop markdown file here"
           />
         </div>
@@ -154,27 +180,57 @@ export default function Home() {
           </div>
         </div>
 
-        {generatedLink && (
-          <InfoBox
-            type={"success"}
-            title="Your link is ready!"
-            description={
-              <Link
-                href={generatedLink}
-                target="_blank"
-                className="text-blue-600 hover:underline"
-              >
-                {generatedLink}
-              </Link>
-            }
-            icon={<LinkIcon variant="Bulk" size={24} color="currentColor" />}
-            actions={[
-              <Button key={"copy"} onClick={copyLink} variant={"secondary"}>
-                <Copy size={16} color="currentColor" variant="Bulk" />
-                Copy
-              </Button>,
-            ]}
-          />
+        {generatedLinks.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              Generated Links
+            </h2>
+
+            {generatedLinks.length > 1 && (
+              <div className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+                <input
+                  type="text"
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  placeholder="Group Name"
+                  className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                />
+                <Button onClick={handleCreateGroup}>Create Group</Button>
+              </div>
+            )}
+
+            <div className="grid gap-4">
+              {generatedLinks.map((link) => (
+                <InfoBox
+                  key={link.id}
+                  type={"success"}
+                  title={link.title}
+                  description={
+                    <Link
+                      href={link.url}
+                      target="_blank"
+                      className="text-blue-600 hover:underline"
+                    >
+                      {link.url}
+                    </Link>
+                  }
+                  icon={
+                    <LinkIcon variant="Bulk" size={24} color="currentColor" />
+                  }
+                  actions={[
+                    <Button
+                      key={"copy"}
+                      onClick={() => copyLink(link.url)}
+                      variant={"secondary"}
+                    >
+                      <Copy size={16} color="currentColor" variant="Bulk" />
+                      Copy
+                    </Button>,
+                  ]}
+                />
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>
