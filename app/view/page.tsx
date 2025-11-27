@@ -9,6 +9,8 @@ import { ArchiveBook, DocumentDownload, Share } from "iconsax-react";
 import { toast } from "sonner";
 import { useSavedLinks } from "@/hooks/use-saved-links";
 
+import useShare from "@/hooks/aevr/use-share";
+
 function ViewContent() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -16,6 +18,7 @@ function ViewContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isSaved, saveLink, removeLink } = useSavedLinks();
+  const { shareContent, isSharing } = useShare();
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -43,9 +46,12 @@ function ViewContent() {
     fetchContent();
   }, [id]);
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast.success("Link copied to clipboard!");
+  const handleShare = async () => {
+    await shareContent(window.location.href, {
+      title: "Markdown Viewer",
+      description: "Check out this markdown file!",
+      fallbackCopy: true,
+    });
   };
 
   const handleDownload = () => {
@@ -100,11 +106,14 @@ function ViewContent() {
         <div className="mb-6 flex items-center justify-end gap-2">
           <button
             onClick={handleShare}
-            className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            disabled={isSharing}
+            className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
             title="Share Link"
           >
             <Share size={18} variant="Bulk" color="currentColor" />
-            <span className="hidden sm:inline">Share</span>
+            <span className="hidden sm:inline">
+              {isSharing ? "Sharing..." : "Share"}
+            </span>
           </button>
           <button
             onClick={handleDownload}
