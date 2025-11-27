@@ -137,8 +137,8 @@ export default function Home() {
       toast.success(`Group "${groupName}" created!`);
       setGroupName("");
 
-      // Scroll to top or show success message clearly
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // // Scroll to top or show success message clearly
+      // window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
