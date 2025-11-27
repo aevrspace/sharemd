@@ -4,11 +4,13 @@ import React, { useState } from "react";
 import FileUpload, { UploadedFile } from "@/components/ui/aevr/file-upload";
 import { toast } from "sonner";
 import { Copy, Link as LinkIcon } from "iconsax-react";
+import { useSavedLinks } from "@/hooks/use-saved-links";
 
 export default function Home() {
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [textInput, setTextInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const { saveLink } = useSavedLinks();
 
   // We need to construct the provider manually because s3Uploader is an instance,
   // but FileUpload expects a provider object that matches the interface.
@@ -47,7 +49,7 @@ export default function Home() {
     if (files.length > 0 && files[0].uploadResult) {
       const fileData = files[0].uploadResult as { id: string };
       if (fileData.id) {
-        generateLink(fileData.id);
+        generateLink(fileData.id, files[0].file.name);
       }
     }
   };
@@ -71,7 +73,7 @@ export default function Home() {
       const result = await response.json();
 
       if (result.success && result.data) {
-        generateLink(result.data.id);
+        generateLink(result.data.id, "Untitled Markdown");
         toast.success("Text uploaded successfully!");
       } else {
         toast.error(result.error || "Failed to upload text");
@@ -84,9 +86,10 @@ export default function Home() {
     }
   };
 
-  const generateLink = (id: string) => {
+  const generateLink = (id: string, title?: string) => {
     const link = `${window.location.origin}/view?id=${id}`;
     setGeneratedLink(link);
+    saveLink(id, title);
   };
 
   const copyLink = () => {
