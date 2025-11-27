@@ -21,6 +21,7 @@ export default function Home() {
     count: number;
     id?: string;
   } | null>(null);
+  const [isGrouping, setIsGrouping] = useState(false);
   const { saveLink, createGroup } = useSavedLinks();
 
   // We need to construct the provider manually because s3Uploader is an instance,
@@ -121,6 +122,7 @@ export default function Home() {
   };
 
   const handleCreateGroup = async () => {
+    setIsGrouping(true);
     if (!groupName.trim()) {
       toast.error("Please enter a group name");
       return;
@@ -140,22 +142,23 @@ export default function Home() {
       // // Scroll to top or show success message clearly
       // window.scrollTo({ top: 0, behavior: "smooth" });
     }
+    setIsGrouping(false);
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 p-8 dark:bg-zinc-950">
+    <div className="min-h-screen bg-neutral-50 p-2 lg:p-8 dark:bg-neutral-950">
       <div className="mx-auto max-w-2xl space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
             Markdown Share
           </h1>
-          <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 text-neutral-600 dark:text-neutral-400">
             Upload a file or paste markdown to generate a shareable link.
           </p>
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
             Upload File
           </h2>
           <FileUpload
@@ -170,20 +173,20 @@ export default function Home() {
         </div>
 
         <div className="relative flex items-center py-4">
-          <div className="grow border-t border-zinc-200 dark:border-zinc-800"></div>
-          <span className="mx-4 shrink-0 text-zinc-400">OR</span>
-          <div className="grow border-t border-zinc-200 dark:border-zinc-800"></div>
+          <div className="grow border-t border-neutral-200 dark:border-neutral-800"></div>
+          <span className="mx-4 shrink-0 text-neutral-400">OR</span>
+          <div className="grow border-t border-neutral-200 dark:border-neutral-800"></div>
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
             Paste Markdown
           </h2>
           <textarea
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
             placeholder="# Paste your markdown here..."
-            className="h-48 w-full rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            className="h-48 w-full rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
           />
           <div className="mt-4 flex justify-end">
             <button
@@ -208,12 +211,12 @@ export default function Home() {
                   in the top right.
                 </p>
                 {createdGroup.id && (
-                  <div className="mt-2 rounded-lg bg-zinc-100 p-2 dark:bg-zinc-800">
-                    <p className="text-xs font-medium text-zinc-500">
+                  <div className="mt-2 rounded-lg bg-neutral-100 p-2 dark:bg-neutral-800">
+                    <p className="text-xs font-medium text-neutral-500">
                       Shareable Link:
                     </p>
                     <div className="mt-1 flex items-center gap-2">
-                      <code className="flex-1 truncate text-xs text-zinc-700 dark:text-zinc-300">
+                      <code className="flex-1 truncate text-xs text-neutral-700 dark:text-neutral-300">
                         {window.location.origin}/group/{createdGroup.id}
                       </code>
                       <Button
@@ -248,20 +251,22 @@ export default function Home() {
 
         {generatedLinks.length > 0 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
               Generated Links
             </h2>
 
             {generatedLinks.length > 1 && (
-              <div className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
                 <input
                   type="text"
                   value={groupName}
                   onChange={(e) => setGroupName(e.target.value)}
                   placeholder="Group Name"
-                  className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="flex-1 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
                 />
-                <Button onClick={handleCreateGroup}>Create Group</Button>
+                <Button onClick={handleCreateGroup}>
+                  {isGrouping ? "Grouping..." : "Create Group"}
+                </Button>
               </div>
             )}
 

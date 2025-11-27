@@ -112,13 +112,13 @@ export default function ViewClient({
   }
 
   return (
-    <div className="min-h-screen bg-white p-8 dark:bg-zinc-950">
+    <div className="min-h-screen bg-white p-8 dark:bg-neutral-950">
       <div className="mx-auto max-w-4xl">
         <div className="mb-6 flex items-center justify-end gap-2">
           <button
             onClick={handleShare}
             disabled={isSharing}
-            className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
             title="Share Link"
           >
             <Share size={18} variant="Bulk" color="currentColor" />
@@ -128,7 +128,7 @@ export default function ViewClient({
           </button>
           <button
             onClick={handleDownload}
-            className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
             title="Download Markdown"
           >
             <DocumentDownload size={18} variant="Bulk" color="currentColor" />
@@ -139,7 +139,7 @@ export default function ViewClient({
             className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
               id && isSaved(id)
                 ? "border-indigo-200 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:border-indigo-900/30 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/30"
-                : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                : "border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
             }`}
             title={id && isSaved(id) ? "Remove Bookmark" : "Bookmark"}
           >

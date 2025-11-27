@@ -457,11 +457,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
         className={`relative cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
           isDragOver
             ? "border-indigo-400 bg-indigo-50 dark:border-indigo-500 dark:bg-indigo-950/20"
-            : "border-zinc-300 hover:border-zinc-400 dark:border-zinc-600 dark:hover:border-zinc-500"
+            : "border-neutral-300 hover:border-neutral-400 dark:border-neutral-600 dark:hover:border-neutral-500"
         } ${
           uploadedFiles.length > 0
-            ? "bg-zinc-50 dark:bg-zinc-800/50"
-            : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+            ? "bg-neutral-50 dark:bg-neutral-800/50"
+            : "hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
         } `}
       >
         <input
@@ -476,7 +476,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         <div className="flex flex-col items-center">
           <DocumentUpload
             className={`mx-auto h-12 w-12 ${
-              isDragOver ? "text-indigo-500" : "text-zinc-400"
+              isDragOver ? "text-indigo-500" : "text-neutral-400"
             }`}
             variant="Bulk"
             color="currentColor"
@@ -487,19 +487,19 @@ const FileUpload: React.FC<FileUploadProps> = ({
               className={`text-sm font-medium ${
                 isDragOver
                   ? "text-indigo-600"
-                  : "text-zinc-700 dark:text-zinc-300"
+                  : "text-neutral-700 dark:text-neutral-300"
               }`}
             >
               {title}
               {required && <span className="ml-1 text-red-500">*</span>}
             </p>
-            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
               {description}
             </p>
-            <p className="mt-2 text-xs text-zinc-400">
+            <p className="mt-2 text-xs text-neutral-400">
               Max {maxFiles} files, {maxFileSize}MB each
             </p>
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-neutral-400">
               Supported: {acceptedTypes.join(", ")}
             </p>
             {(localMode || !provider) && (
@@ -511,10 +511,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
         </div>
 
         {isUploading && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/80 dark:bg-zinc-800/80">
+          <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/80 dark:bg-neutral-800/80">
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"></div>
-              <span className="text-sm text-zinc-600">Processing files...</span>
+              <span className="text-sm text-neutral-600">
+                Processing files...
+              </span>
             </div>
           </div>
         )}
@@ -524,7 +526,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       {uploadedFiles.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <h4 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
               Uploaded Files ({uploadedFiles.length}/{maxFiles})
             </h4>
             {uploadedFiles.length > 1 && (
@@ -542,7 +544,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             {uploadedFiles.map((file) => (
               <div
                 key={file.id}
-                className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-600 dark:bg-zinc-800"
+                className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-3 dark:border-neutral-600 dark:bg-neutral-800"
               >
                 <div className="flex items-center gap-3">
                   {showPreviews && file.preview ? (
@@ -557,10 +559,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
                   )}
 
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    <p className="truncate text-sm font-medium text-neutral-700 dark:text-neutral-300">
                       {file.name}
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-neutral-500">
                       {formatFileSize(file.size)}
                       {file.uploadResult && (
                         <span className="ml-2 text-green-600">• Uploaded</span>
@@ -575,7 +577,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     e.stopPropagation();
                     removeFile(file.id);
                   }}
-                  className="rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-red-500 dark:hover:bg-zinc-700"
+                  className="rounded-full p-1 text-neutral-400 hover:bg-neutral-100 hover:text-red-500 dark:hover:bg-neutral-700"
                   title="Remove file"
                 >
                   <CloseCircle

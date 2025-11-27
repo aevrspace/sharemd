@@ -31,10 +31,10 @@ export default async function GroupPage({
   if (!response || !response.success) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-8">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
           Group Not Found
         </h1>
-        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-neutral-600 dark:text-neutral-400">
           The group you are looking for does not exist or has been deleted.
         </p>
         <Link
@@ -50,17 +50,17 @@ export default async function GroupPage({
   const group = response.data;
 
   return (
-    <div className="min-h-screen bg-zinc-50 p-8 dark:bg-zinc-950">
+    <div className="min-h-screen bg-neutral-50 p-2 lg:p-8 dark:bg-neutral-950">
       <div className="mx-auto max-w-3xl space-y-8">
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="flex items-center justify-center rounded-lg border border-zinc-200 bg-white p-2 text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="flex items-center justify-center rounded-lg border border-neutral-200 bg-white p-2 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
           >
             <ArrowLeft size={20} variant="Bulk" color="currentColor" />
           </Link>
           <div>
-            <h1 className="flex items-center gap-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+            <h1 className="flex items-center gap-2 text-2xl font-bold text-neutral-900 dark:text-neutral-100">
               <Folder
                 size={28}
                 variant="Bulk"
@@ -69,7 +69,7 @@ export default async function GroupPage({
               />
               {group.title}
             </h1>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
               Created{" "}
               {formatDistanceToNow(new Date(group.createdAt), {
                 addSuffix: true,
@@ -84,7 +84,7 @@ export default async function GroupPage({
             (link: { _id: string; content: string; createdAt: string }) => (
               <div
                 key={link._id}
-                className="group relative overflow-hidden rounded-xl border border-zinc-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+                className="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
@@ -96,13 +96,13 @@ export default async function GroupPage({
                       />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
+                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">
                         Markdown Document
                       </h3>
-                      <p className="mt-1 line-clamp-2 text-sm text-zinc-500 dark:text-zinc-400">
+                      <p className="mt-1 line-clamp-2 text-sm text-neutral-500 dark:text-neutral-400">
                         {link.content.substring(0, 150)}...
                       </p>
-                      <div className="mt-3 flex items-center gap-2 text-xs text-zinc-400">
+                      <div className="mt-3 flex items-center gap-2 text-xs text-neutral-400">
                         <span>ID: {link._id}</span>
                         <span>•</span>
                         <span>
