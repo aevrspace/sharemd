@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import FileUpload from "@/components/ui/aevr/file-upload";
 import { toast } from "sonner";
-import { Copy, Link as LinkIcon, Folder } from "iconsax-react";
+import { Copy, Link as LinkIcon, Folder, Eye } from "iconsax-react";
 import { useSavedLinks } from "@/hooks/use-saved-links";
 import { Button } from "@/components/ui/aevr/button";
 import { InfoBox } from "@/components/ui/aevr/info-box";
@@ -230,6 +230,13 @@ export default function Home() {
                         }}
                       >
                         <Copy size={14} variant="Bulk" color="currentColor" />
+                      </Button>
+                      <Button size={"sm"} asChild>
+                        <Link
+                          href={`${window.location.origin}/group/${createdGroup.id}`}
+                        >
+                          <Eye size={14} variant="Bulk" color="currentColor" />
+                        </Link>
                       </Button>
                     </div>
                   </div>
