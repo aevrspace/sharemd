@@ -4,10 +4,11 @@ import React, { useState, useEffect } from "react";
 import { Viewer } from "@/components/viewer";
 import Loader from "@/components/ui/aevr/loader";
 import { InfoBox } from "@/components/ui/aevr/info-box";
-import { ArchiveBook, DocumentDownload, Share } from "iconsax-react";
+import { ArchiveBook, DocumentDownload, Share, Edit } from "iconsax-react";
 import { toast } from "sonner";
 import { useSavedLinks } from "@/hooks/use-saved-links";
 import useShare from "@/hooks/aevr/use-share";
+import Editor from "@/components/editor";
 
 interface ViewClientProps {
   initialContent?: string | null;
@@ -25,6 +26,8 @@ export default function ViewClient({
   const [error, setError] = useState<string | null>(initialError || null);
   const { isSaved, saveLink, removeLink } = useSavedLinks();
   const { shareContent, isSharing } = useShare();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (initialContent || initialError) {
@@ -90,6 +93,34 @@ export default function ViewClient({
     }
   };
 
+  const handleSaveContent = async (newContent: string) => {
+    if (!id) return;
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/view/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: newContent }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to update content");
+      }
+
+      setContent(result.data.content);
+      setIsEditing(false);
+      toast.success("Content updated successfully!");
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -115,6 +146,16 @@ export default function ViewClient({
     <div className="min-h-screen bg-white p-8 dark:bg-neutral-950">
       <div className="mx-auto max-w-4xl">
         <div className="mb-6 flex items-center justify-end gap-2">
+          {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              title="Edit Markdown"
+            >
+              <Edit size={18} variant="Bulk" color="currentColor" />
+              <span className="hidden sm:inline">Edit</span>
+            </button>
+          )}
           <button
             onClick={handleShare}
             disabled={isSharing}
@@ -153,7 +194,16 @@ export default function ViewClient({
             </span>
           </button>
         </div>
-        {content && <Viewer content={content} />}
+        {content && isEditing ? (
+          <Editor
+            initialContent={content}
+            onSave={handleSaveContent}
+            onCancel={() => setIsEditing(false)}
+            isSaving={isSaving}
+          />
+        ) : (
+          content && <Viewer content={content} />
+        )}
       </div>
     </div>
   );

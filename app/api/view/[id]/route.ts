@@ -36,3 +36,49 @@ export async function GET(
     );
   }
 }
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await dbConnect();
+    const { id } = await params;
+    const body = await req.json();
+    const { content } = body;
+
+    if (!content) {
+      return NextResponse.json(
+        { success: false, error: "Content is required" },
+        { status: 400 }
+      );
+    }
+
+    const markdown = await Markdown.findByIdAndUpdate(
+      id,
+      { content },
+      { new: true }
+    );
+
+    if (!markdown) {
+      return NextResponse.json(
+        { success: false, error: "Markdown not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        content: markdown.content,
+        createdAt: markdown.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error("Update error:", error);
+    return NextResponse.json(
+      { success: false, error: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
