@@ -18,6 +18,11 @@ import {
   Undo,
   Redo,
 } from "lucide-react";
+import { marked } from "marked";
+import { useEffect } from "react";
+import Loader from "./ui/aevr/loader";
+import { Check, CloseCircle, Save2, SaveAdd, TickCircle } from "iconsax-react";
+import { Button } from "./ui/aevr/button";
 
 interface EditorProps {
   initialContent?: string;
@@ -142,7 +147,7 @@ export default function Editor({
         placeholder: "Start writing...",
       }),
     ],
-    content: initialContent,
+    content: "", // Initial content will be set via useEffect after parsing
     editorProps: {
       attributes: {
         class:
@@ -150,6 +155,16 @@ export default function Editor({
       },
     },
   });
+
+  useEffect(() => {
+    const parseContent = async () => {
+      if (initialContent && editor) {
+        const html = await marked.parse(initialContent);
+        editor.commands.setContent(html);
+      }
+    };
+    parseContent();
+  }, [initialContent, editor]);
 
   if (!editor) {
     return null;
@@ -257,20 +272,31 @@ export default function Editor({
       <MenuBar editor={editor} />
       <EditorContent editor={editor} />
       <div className="flex items-center justify-end gap-2 border-t border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-800 dark:bg-neutral-900/50">
-        <button
-          onClick={onCancel}
-          className="rounded-lg px-3 py-1.5 text-sm font-medium text-neutral-600 hover:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-800"
-          disabled={isSaving}
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-        >
-          {isSaving ? "Saving..." : "Save Changes"}
-        </button>
+        <Button onClick={onCancel} disabled={isSaving} variant={"secondary"}>
+          <CloseCircle
+            className="icon w-5 h-5"
+            variant="Bulk"
+            color="currentColor"
+          />
+          <span>Cancel</span>
+        </Button>
+        <Button onClick={handleSave} disabled={isSaving}>
+          {isSaving ? (
+            <>
+              <Loader loading />
+              <span>Saving...</span>
+            </>
+          ) : (
+            <>
+              <TickCircle
+                className="icon w-5 h-5"
+                variant="Bulk"
+                color="currentColor"
+              />
+              <span>Save Changes</span>
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );
