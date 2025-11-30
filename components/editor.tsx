@@ -23,7 +23,7 @@ import {
   Heading4,
 } from "lucide-react";
 import { marked } from "marked";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Loader from "./ui/aevr/loader";
 import { CloseCircle, TickCircle } from "iconsax-react";
 import { Button } from "./ui/aevr/button";
@@ -205,7 +205,36 @@ export default function Editor({
           "prose prose-zinc dark:prose-invert max-w-none min-h-[300px] p-4 focus:outline-none",
       },
     },
+    onUpdate: ({ editor }) => {
+      // Force re-render to update button state
+      editor.isActive("bold"); // Just accessing a property to ensure reactivity if needed, but onUpdate is enough to trigger component re-render if we use a state.
+      // Actually, useEditor triggers re-render on update by default? No.
+      // We need to use a state or forceUpdate.
+      // But wait, the buttons use `editor.isActive(...)` which works because `MenuBar` re-renders?
+      // `MenuBar` is a child component. Does `useEditor` return a new object reference on update? No.
+      // We need to store `isEmpty` in a state or force update.
+    },
   });
+
+  // We need to track empty state to disable the button
+  const [isEmpty, setIsEmpty] = useState(true);
+
+  useEffect(() => {
+    if (editor) {
+      // Set initial state
+      setIsEmpty(editor.isEmpty);
+
+      const updateEmptyState = () => {
+        setIsEmpty(editor.isEmpty);
+      };
+
+      editor.on("update", updateEmptyState);
+
+      return () => {
+        editor.off("update", updateEmptyState);
+      };
+    }
+  }, [editor]);
 
   useEffect(() => {
     const parseContent = async () => {
@@ -334,7 +363,7 @@ export default function Editor({
             />
             <span>Cancel</span>
           </Button>
-          <Button onClick={handleSave} disabled={isSaving || editor.isEmpty}>
+          <Button onClick={handleSave} disabled={isSaving || isEmpty}>
             {isSaving ? (
               <>
                 <Loader loading />
