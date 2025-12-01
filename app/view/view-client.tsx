@@ -10,6 +10,7 @@ import { useSavedLinks } from "@/hooks/use-saved-links";
 import useShare from "@/hooks/aevr/use-share";
 import Editor from "@/components/editor";
 import { Button } from "@/components/ui/aevr/button";
+import { AnimatePresence, motion } from "motion/react";
 
 interface ViewClientProps {
   initialContent?: string | null;
@@ -195,16 +196,36 @@ export default function ViewClient({
             </span>
           </Button>
         </div>
-        {content && isEditing ? (
-          <Editor
-            initialContent={content}
-            onSave={handleSaveContent}
-            onCancel={() => setIsEditing(false)}
-            isSaving={isSaving}
-          />
-        ) : (
-          content && <Viewer content={content} />
-        )}
+        <AnimatePresence mode="wait">
+          {content && isEditing ? (
+            <motion.div
+              key="editor"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Editor
+                initialContent={content}
+                onSave={handleSaveContent}
+                onCancel={() => setIsEditing(false)}
+                isSaving={isSaving}
+              />
+            </motion.div>
+          ) : (
+            content && (
+              <motion.div
+                key="viewer"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Viewer content={content} />
+              </motion.div>
+            )
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

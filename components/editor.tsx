@@ -23,7 +23,7 @@ import {
   Heading4,
 } from "lucide-react";
 import { marked } from "marked";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Loader from "./ui/aevr/loader";
 import { CloseCircle, TickCircle } from "iconsax-react";
 import { Button } from "./ui/aevr/button";
@@ -205,7 +205,36 @@ export default function Editor({
           "prose prose-zinc dark:prose-invert max-w-none min-h-[300px] p-4 focus:outline-none",
       },
     },
+    onUpdate: ({ editor }) => {
+      // Force re-render to update button state
+      editor.isActive("bold"); // Just accessing a property to ensure reactivity if needed, but onUpdate is enough to trigger component re-render if we use a state.
+      // Actually, useEditor triggers re-render on update by default? No.
+      // We need to use a state or forceUpdate.
+      // But wait, the buttons use `editor.isActive(...)` which works because `MenuBar` re-renders?
+      // `MenuBar` is a child component. Does `useEditor` return a new object reference on update? No.
+      // We need to store `isEmpty` in a state or force update.
+    },
   });
+
+  // We need to track empty state to disable the button
+  const [isEmpty, setIsEmpty] = useState(true);
+
+  useEffect(() => {
+    if (editor) {
+      // Set initial state - removed to avoid sync setState warning
+      // setIsEmpty(editor.isEmpty);
+
+      const updateEmptyState = () => {
+        setIsEmpty(editor.isEmpty);
+      };
+
+      editor.on("update", updateEmptyState);
+
+      return () => {
+        editor.off("update", updateEmptyState);
+      };
+    }
+  }, [editor]);
 
   useEffect(() => {
     const parseContent = async () => {
@@ -319,35 +348,39 @@ export default function Editor({
   };
 
   return (
-    <div className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
-      <MenuBar editor={editor} />
+    <div className="relative rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
+      <div className="rounded-t-lg overflow-hidden">
+        <MenuBar editor={editor} />
+      </div>
       <EditorContent editor={editor} />
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl border border-neutral-200 bg-white/80 p-2 shadow-lg backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/80">
-        <Button onClick={onCancel} disabled={isSaving} variant={"secondary"}>
-          <CloseCircle
-            className="icon w-5 h-5"
-            variant="Bulk"
-            color="currentColor"
-          />
-          <span>Cancel</span>
-        </Button>
-        <Button onClick={handleSave} disabled={isSaving || editor.isEmpty}>
-          {isSaving ? (
-            <>
-              <Loader loading />
-              <span>Saving...</span>
-            </>
-          ) : (
-            <>
-              <TickCircle
-                color="currentColor"
-                variant="Bulk"
-                className="icon w-5 h-5"
-              />
-              <span>{saveButtonText}</span>
-            </>
-          )}
-        </Button>
+      <div className="sticky bottom-4 z-10 flex justify-end px-4 pb-2 pointer-events-none">
+        <div className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white/80 p-2 shadow-lg backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/80 pointer-events-auto">
+          <Button onClick={onCancel} disabled={isSaving} variant={"secondary"}>
+            <CloseCircle
+              className="icon w-5 h-5"
+              variant="Bulk"
+              color="currentColor"
+            />
+            <span>Cancel</span>
+          </Button>
+          <Button onClick={handleSave} disabled={isSaving || isEmpty}>
+            {isSaving ? (
+              <>
+                <Loader loading />
+                <span>Saving...</span>
+              </>
+            ) : (
+              <>
+                <TickCircle
+                  color="currentColor"
+                  variant="Bulk"
+                  className="icon w-5 h-5"
+                />
+                <span>{saveButtonText}</span>
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
