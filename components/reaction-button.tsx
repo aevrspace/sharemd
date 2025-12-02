@@ -36,7 +36,7 @@ export default function ReactionButton({ markdownId }: ReactionButtonProps) {
 
   useEffect(() => {
     const fetchReactions = async () => {
-      if (!visitor) return;
+      if (!visitor?._id) return;
       try {
         const response = await fetch(
           `/api/view/${markdownId}/reactions?visitorId=${visitor._id}`
@@ -54,7 +54,7 @@ export default function ReactionButton({ markdownId }: ReactionButtonProps) {
     };
 
     fetchReactions();
-  }, [markdownId, visitor]);
+  }, [markdownId, visitor?._id]);
 
   const handleToggle = async (emoji: string) => {
     if (!visitor) return;

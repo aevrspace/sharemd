@@ -33,7 +33,7 @@ export default function CommentsSection({ markdownId }: CommentsSectionProps) {
     if (visitor?.name) {
       setVisitorNameInput(visitor.name);
     }
-  }, [visitor]);
+  }, [visitor?.name]);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -86,7 +86,7 @@ export default function CommentsSection({ markdownId }: CommentsSectionProps) {
       } else {
         toast.error(result.error || "Failed to add comment");
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred");
     } finally {
       setIsSubmitting(false);
