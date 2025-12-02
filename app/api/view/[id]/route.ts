@@ -25,6 +25,7 @@ export async function GET(
       success: true,
       data: {
         content: markdown.content,
+        title: markdown.title,
         createdAt: markdown.createdAt,
       },
     });
@@ -45,20 +46,22 @@ export async function PUT(
     await dbConnect();
     const { id } = await params;
     const body = await req.json();
-    const { content } = body;
+    const { content, title } = body;
 
-    if (!content) {
+    if (!content && !title) {
       return NextResponse.json(
-        { success: false, error: "Content is required" },
+        { success: false, error: "Content or title is required" },
         { status: 400 }
       );
     }
 
-    const markdown = await Markdown.findByIdAndUpdate(
-      id,
-      { content },
-      { new: true }
-    );
+    const updateData: { content?: string; title?: string } = {};
+    if (content) updateData.content = content;
+    if (title) updateData.title = title;
+
+    const markdown = await Markdown.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     if (!markdown) {
       return NextResponse.json(
@@ -71,6 +74,7 @@ export async function PUT(
       success: true,
       data: {
         content: markdown.content,
+        title: markdown.title,
         createdAt: markdown.createdAt,
       },
     });

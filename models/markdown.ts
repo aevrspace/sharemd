@@ -4,6 +4,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IMarkdown extends Document {
   content: string;
+  title?: string;
   createdAt: Date;
 }
 
@@ -11,6 +12,10 @@ const MarkdownSchema: Schema = new Schema({
   content: {
     type: String,
     required: [true, "Please provide markdown content"],
+  },
+  title: {
+    type: String,
+    required: false,
   },
   createdAt: {
     type: Date,

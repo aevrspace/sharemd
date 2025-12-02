@@ -14,16 +14,24 @@ import { AnimatePresence, motion } from "motion/react";
 
 interface ViewClientProps {
   initialContent?: string | null;
+  initialTitle?: string | null;
   id: string;
   initialError?: string | null;
 }
 
 export default function ViewClient({
   initialContent,
+  initialTitle,
   id,
   initialError,
 }: ViewClientProps) {
   const [content, setContent] = useState<string | null>(initialContent || null);
+  const [title, setTitle] = useState<string>(
+    initialTitle || "Untitled Markdown"
+  );
+  const [titleInput, setTitleInput] = useState<string>(
+    initialTitle || "Untitled Markdown"
+  );
   const [loading, setLoading] = useState(!initialContent && !initialError);
   const [error, setError] = useState<string | null>(initialError || null);
   const { isSaved, saveLink, removeLink } = useSavedLinks();
@@ -52,6 +60,8 @@ export default function ViewClient({
           throw new Error(result.error || "Failed to fetch content");
         }
         setContent(result.data.content);
+        setTitle(result.data.title || "Untitled Markdown");
+        setTitleInput(result.data.title || "Untitled Markdown");
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -104,7 +114,10 @@ export default function ViewClient({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content: newContent }),
+        body: JSON.stringify({
+          content: newContent,
+          title: titleInput,
+        }),
       });
 
       const result = await response.json();
@@ -114,6 +127,7 @@ export default function ViewClient({
       }
 
       setContent(result.data.content);
+      setTitle(result.data.title || "Untitled Markdown");
       setIsEditing(false);
       toast.success("Content updated successfully!");
     } catch (err) {
@@ -205,10 +219,22 @@ export default function ViewClient({
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
+              <div className="mb-4">
+                <input
+                  type="text"
+                  value={titleInput}
+                  onChange={(e) => setTitleInput(e.target.value)}
+                  placeholder="Document Title"
+                  className="w-full text-2xl font-bold bg-transparent border-b border-neutral-200 py-2 focus:border-indigo-500 focus:outline-none dark:border-neutral-800 dark:text-neutral-100"
+                />
+              </div>
               <Editor
                 initialContent={content}
                 onSave={handleSaveContent}
-                onCancel={() => setIsEditing(false)}
+                onCancel={() => {
+                  setIsEditing(false);
+                  setTitleInput(title); // Reset title input on cancel
+                }}
                 isSaving={isSaving}
               />
             </motion.div>
@@ -221,6 +247,9 @@ export default function ViewClient({
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
+                <h1 className="mb-6 text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+                  {title}
+                </h1>
                 <Viewer content={content} />
               </motion.div>
             )
