@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Reaction from "@/models/reaction";
 import Visitor from "@/models/visitor";
+import mongoose from "mongoose";
 
 export async function GET(
   req: NextRequest,
@@ -13,23 +14,35 @@ export async function GET(
     const { searchParams } = new URL(req.url);
     const visitorId = searchParams.get("visitorId");
 
-    const count = await Reaction.countDocuments({ markdown: id, type: "like" });
+    const reactions = await Reaction.aggregate([
+      { $match: { markdown: new mongoose.Types.ObjectId(id) } },
+      {
+        $group: {
+          _id: "$type",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
 
-    let userReacted = false;
+    const counts: Record<string, number> = {};
+    reactions.forEach((r) => {
+      counts[r._id] = r.count;
+    });
+
+    let userReactions: string[] = [];
     if (visitorId) {
-      const reaction = await Reaction.findOne({
+      const userReacts = await Reaction.find({
         markdown: id,
         visitor: visitorId,
-        type: "like",
       });
-      userReacted = !!reaction;
+      userReactions = userReacts.map((r) => r.type);
     }
 
     return NextResponse.json({
       success: true,
       data: {
-        count,
-        userReacted,
+        counts,
+        userReactions,
       },
     });
   } catch (error) {
@@ -49,11 +62,11 @@ export async function POST(
     await dbConnect();
     const { id } = await params;
     const body = await req.json();
-    const { visitorId } = body;
+    const { visitorId, type } = body;
 
-    if (!visitorId) {
+    if (!visitorId || !type) {
       return NextResponse.json(
-        { success: false, error: "VisitorId is required" },
+        { success: false, error: "VisitorId and type are required" },
         { status: 400 }
       );
     }
@@ -67,30 +80,30 @@ export async function POST(
       );
     }
 
-    // Check if already reacted
+    // Check if already reacted with this emoji
     const existingReaction = await Reaction.findOne({
       markdown: id,
       visitor: visitorId,
-      type: "like",
+      type: type,
     });
 
     if (existingReaction) {
-      // Unlike
+      // Remove reaction
       await Reaction.findByIdAndDelete(existingReaction._id);
       return NextResponse.json({
         success: true,
-        data: { reacted: false },
+        data: { reacted: false, type },
       });
     } else {
-      // Like
+      // Add reaction
       await Reaction.create({
         markdown: id,
         visitor: visitorId,
-        type: "like",
+        type: type,
       });
       return NextResponse.json({
         success: true,
-        data: { reacted: true },
+        data: { reacted: true, type },
       });
     }
   } catch (error) {
