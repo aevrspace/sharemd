@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IReaction extends Document {
-  type: "like";
+  type: string;
   visitor: mongoose.Types.ObjectId;
   markdown: mongoose.Types.ObjectId;
   createdAt: Date;
@@ -10,8 +10,6 @@ export interface IReaction extends Document {
 const ReactionSchema: Schema = new Schema({
   type: {
     type: String,
-    enum: ["like"],
-    default: "like",
     required: true,
   },
   visitor: {
