@@ -1,4 +1,4 @@
-# Markdown Viewer
+# Share MD
 
 A modern, feature-rich application for sharing and viewing Markdown files. Upload your markdown files or paste content directly to generate shareable links instantly.
 
