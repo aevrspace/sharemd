@@ -181,6 +181,11 @@ export default function CommentsSection({ markdownId }: CommentsSectionProps) {
                 <span className="font-medium text-neutral-900 dark:text-neutral-100">
                   {comment.visitor.name || "Anonymous"}
                 </span>
+                {visitor && visitor._id === comment.visitor._id && (
+                  <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                    (You)
+                  </span>
+                )}
                 <span className="text-xs text-neutral-500">
                   {new Date(comment.createdAt).toLocaleDateString()}
                 </span>
