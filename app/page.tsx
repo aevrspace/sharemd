@@ -17,6 +17,7 @@ export default function Home() {
     Array<{ id: string; title: string; url: string }>
   >([]);
   const [textInput, setTextInput] = useState("");
+  const [titleInput, setTitleInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [createdGroup, setCreatedGroup] = useState<{
@@ -94,6 +95,9 @@ export default function Home() {
     try {
       const formData = new FormData();
       formData.append("text", content);
+      if (titleInput.trim()) {
+        formData.append("title", titleInput.trim());
+      }
 
       const response = await fetch("/api/upload", {
         method: "POST",
@@ -105,14 +109,13 @@ export default function Home() {
       if (result.success && result.data) {
         const id = result.data.id;
         const url = `${window.location.origin}/view?id=${id}`;
-        setGeneratedLinks((prev) => [
-          ...prev,
-          { id, title: "Untitled Markdown", url },
-        ]);
-        saveLink(id, "Untitled Markdown");
+        const title = titleInput.trim() || "Untitled Markdown";
+        setGeneratedLinks((prev) => [...prev, { id, title, url }]);
+        saveLink(id, title);
         setShowGeneratedLinksDialog(true);
         toast.success("Text uploaded successfully!");
         setTextInput(""); // Clear input if we were using it, though Editor manages its own state mostly.
+        setTitleInput("");
         // We might need to force reset Editor content if we want to clear it.
         // But for now, let's just rely on the user manually clearing or just leaving it.
         // Actually, Editor takes initialContent. Changing it might reset it if we add a key or useEffect.
@@ -205,10 +208,22 @@ export default function Home() {
           <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
             Paste Markdown
           </h2>
+          <div className="mb-4">
+            <input
+              type="text"
+              value={titleInput}
+              onChange={(e) => setTitleInput(e.target.value)}
+              placeholder="Document Title (Optional)"
+              className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100"
+            />
+          </div>
           <Editor
             initialContent={textInput}
             onSave={handleTextUpload}
-            onCancel={() => setTextInput("")}
+            onCancel={() => {
+              setTextInput("");
+              setTitleInput("");
+            }}
             isSaving={isUploading}
             saveButtonText={isUploading ? "Generating..." : "Generate Link"}
             persistenceKey="markdown-editor-main"
