@@ -1,18 +1,35 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { usePersistedState } from "./aevr/use-persisted-state";
 
 export interface Visitor {
   _id: string;
   name?: string;
 }
 
+interface VisitorState {
+  id: string | null;
+  name: string | null;
+  data: Visitor | null;
+}
+
 export function useVisitor() {
-  const [visitor, setVisitor] = useState<Visitor | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { state, setState, isHydrated } = usePersistedState<VisitorState>(
+    {
+      id: null,
+      name: null,
+      data: null,
+    },
+    {
+      storageKey: "md-viewer-visitor",
+    }
+  );
 
   useEffect(() => {
     const identifyVisitor = async () => {
-      const storedId = localStorage.getItem("visitorId");
-      const storedName = localStorage.getItem("visitorName");
+      if (!isHydrated) return;
+
+      // If we already have visitor data and it matches our stored ID, we might not need to re-identify
+      // But to be safe and ensure lastActiveAt is updated, we call the API
 
       try {
         const response = await fetch("/api/visitor", {
@@ -21,32 +38,31 @@ export function useVisitor() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id: storedId,
-            name: storedName,
+            id: state.id,
+            name: state.name,
           }),
         });
 
         const result = await response.json();
 
         if (result.success) {
-          setVisitor(result.data);
-          localStorage.setItem("visitorId", result.data._id);
-          if (result.data.name) {
-            localStorage.setItem("visitorName", result.data.name);
-          }
+          setState((prev) => ({
+            ...prev,
+            id: result.data._id,
+            name: result.data.name || prev.name,
+            data: result.data,
+          }));
         }
       } catch (error) {
         console.error("Failed to identify visitor:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     identifyVisitor();
-  }, []);
+  }, [isHydrated, state.id, state.name, setState]); // Run once when hydrated
 
   const updateName = async (name: string) => {
-    if (!visitor) return;
+    if (!state.data) return;
 
     try {
       const response = await fetch("/api/visitor", {
@@ -55,7 +71,7 @@ export function useVisitor() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: visitor._id,
+          id: state.data._id,
           name,
         }),
       });
@@ -63,13 +79,20 @@ export function useVisitor() {
       const result = await response.json();
 
       if (result.success) {
-        setVisitor(result.data);
-        localStorage.setItem("visitorName", result.data.name);
+        setState((prev) => ({
+          ...prev,
+          name: result.data.name,
+          data: result.data,
+        }));
       }
     } catch (error) {
       console.error("Failed to update visitor name:", error);
     }
   };
 
-  return { visitor, isLoading, updateName };
+  return {
+    visitor: state.data,
+    isLoading: !isHydrated || !state.data,
+    updateName,
+  };
 }
