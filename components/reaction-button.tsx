@@ -135,17 +135,23 @@ export default function ReactionButton({ markdownId }: ReactionButtonProps) {
         </Button>
 
         {showPicker && (
-          <div className="absolute top-full right-0 mt-2 z-50 shadow-xl rounded-xl overflow-hidden">
-            <Picker
-              data={data}
-              onEmojiSelect={(emoji: { native: string }) =>
-                handleToggle(emoji.native)
-              }
-              theme="auto"
-              previewPosition="none"
-              skinTonePosition="none"
+          <>
+            <div
+              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden"
+              onClick={() => setShowPicker(false)}
             />
-          </div>
+            <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center border-t border-neutral-200 bg-white pb-8 pt-4 shadow-2xl dark:border-neutral-800 dark:bg-neutral-950 md:absolute md:bottom-auto md:left-auto md:right-0 md:top-full md:mt-2 md:block md:rounded-xl md:border-0 md:bg-transparent md:p-0 md:shadow-xl">
+              <Picker
+                data={data}
+                onEmojiSelect={(emoji: { native: string }) =>
+                  handleToggle(emoji.native)
+                }
+                theme="auto"
+                previewPosition="none"
+                skinTonePosition="none"
+              />
+            </div>
+          </>
         )}
       </div>
     </div>
