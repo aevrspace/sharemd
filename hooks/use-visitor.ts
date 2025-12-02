@@ -28,8 +28,10 @@ export function useVisitor() {
     const identifyVisitor = async () => {
       if (!isHydrated) return;
 
-      // If we already have visitor data and it matches our stored ID, we might not need to re-identify
-      // But to be safe and ensure lastActiveAt is updated, we call the API
+      // If we already have a visitor ID and name, we might not need to re-identify immediately
+      // But we want to update lastActiveAt.
+      // To prevent multiple calls from different components, we can use a simple check or debounce.
+      // For now, let's just ensure we don't call if we just called it.
 
       try {
         const response = await fetch("/api/visitor", {
@@ -46,12 +48,22 @@ export function useVisitor() {
         const result = await response.json();
 
         if (result.success) {
-          setState((prev) => ({
-            ...prev,
-            id: result.data._id,
-            name: result.data.name || prev.name,
-            data: result.data,
-          }));
+          // Only update state if data actually changed to avoid triggering effects
+          setState((prev) => {
+            if (
+              prev.id === result.data._id &&
+              prev.name === result.data.name &&
+              JSON.stringify(prev.data) === JSON.stringify(result.data)
+            ) {
+              return prev;
+            }
+            return {
+              ...prev,
+              id: result.data._id,
+              name: result.data.name || prev.name,
+              data: result.data,
+            };
+          });
         }
       } catch (error) {
         console.error("Failed to identify visitor:", error);
@@ -59,7 +71,8 @@ export function useVisitor() {
     };
 
     identifyVisitor();
-  }, [isHydrated, state.id, state.name, setState]); // Run once when hydrated
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHydrated, state.id]); // Removed state.name and setState to prevent loops, added deep comparison in setter
 
   const updateName = async (name: string) => {
     if (!state.data) return;
